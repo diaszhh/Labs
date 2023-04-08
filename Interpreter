@@ -1,0 +1,76 @@
+package org.example;
+
+import java.util.Scanner;
+import java.util.HashMap;
+import java.util.Map;
+
+public class Main {
+    private static final Map<String, Integer> variableMap = new HashMap<>();
+
+    public static void main(String[] args) {
+        String command, operand1 = "", operand2 = "", line;
+        int value1, value2 = 0;
+
+        Scanner scanner = new Scanner(System.in);
+
+        while (scanner.hasNextLine()) {
+            line = scanner.nextLine().trim();
+
+            String[] parsedLine = line.split("\\s+");
+
+            if (parsedLine[1].equals("DB")) {
+                String variable = parsedLine[0];
+                String value = parsedLine[2];
+                if (value.startsWith("'") && value.endsWith("'"))
+                    variableMap.put(variable, (int) value.charAt(1));
+                else if (value.endsWith("b"))
+                    variableMap.put(variable, Integer.parseInt(value.substring(0,value.length()-1), 2));
+                else if (value.endsWith("h"))
+                    variableMap.put(variable, Integer.parseInt(value.substring(0,value.length()-1), 16));
+                else variableMap.put(variable, Integer.parseInt(value));
+            }
+
+            else {
+                command = parsedLine[0];
+                operand1 = parsedLine[1];
+                value1 = getValue(operand1);
+
+                if(parsedLine.length>2){
+                    operand2 = parsedLine[2];
+                    value2 = getValue(operand2);
+                }
+
+                if (command.equals("ADD"))
+                    variableMap.put(operand1, value1 + value2);
+                else if (command.equals("SUB"))
+                    variableMap.put(operand1, value1 - value2);
+                else if (command.equals("MUL"))
+                    variableMap.put(operand1, value1 * value2);
+                else if (command.equals("DIV"))
+                    variableMap.put(operand1, value1 / value2);
+                else if (command.equals("INC"))
+                    variableMap.put(operand1, value1 + 1);
+                else if (command.equals("DEC"))
+                    variableMap.put(operand1, value1 - 1);
+                else if (command.equals("MOV"))
+                    variableMap.put(operand1, value2);
+                else if (command.equals("XCHG")) {
+                    variableMap.put(operand1, value2);
+                    variableMap.put(operand2, value1);
+                } else {
+                    System.out.println("error");
+                }
+            }
+            variableMap.forEach((key, value) -> System.out.println(key + " = " + value));
+        }
+    }
+
+    static int getValue(String operand) {
+        if (operand.startsWith("'") && operand.endsWith("'")) {
+            return operand.charAt(1);
+        } else {
+            return variableMap.get(operand);
+        }
+    }
+
+}
