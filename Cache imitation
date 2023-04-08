@@ -1,0 +1,163 @@
+package com.example.lab4;
+
+import java.util.HashMap;
+import java.util.Scanner;
+
+public class Main {
+    static int N, M, K;
+    static color[][] memory;
+    static HashMap<Integer, color[]> cache = new HashMap<>();
+
+
+    static class color {
+        int c, m, y, k;
+
+        public color(int c, int m, int y, int k) {
+            this.c = c;
+            this.m = m;
+            this.y = y;
+            this.k = k;
+        }
+    }
+
+    public static void main(String[] args) {
+        // Входные значения N, M и K
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("Enter 'N' value: ");
+        N = scanner.nextInt();
+        System.out.println("Enter 'M' value: ");
+        M = scanner.nextInt();
+        System.out.println("Enter 'K' value: ");
+        K = scanner.nextInt();
+
+        // Инициализировние памяти значениями по умолчанию
+        memory = new color[N][M];
+        for (int i = 0; i < N; i++) {
+            for (int j = 0; j < M; j++) {
+                memory[i][j] = new color(0, 0, 1, 0);
+                System.out.print(j + " ");
+            }
+            System.out.println(" i value: " + i + " ");
+
+        }
+
+
+        // Алгоритм 1
+        int accesses1 = 0;
+        int hits1 = 0;
+        int misses1 = 0;
+
+        for (int i = 0; i < N; i++) {
+            for (int j = 0; j < M; j++) {
+                int blockIndex = (i * M + j) / K;
+                if (cache.containsKey(blockIndex)) {
+                    hits1++;
+                } else {
+                    misses1++;
+                    color[] block = new color[K];
+                    for (int b = 0; b < K; b++) {
+                        int x = i * M + j + b;
+                        int row = x / M;
+                        int col = x % M;
+                        block[b] = memory[row][col];
+                    }
+                    cache.put(blockIndex, block);
+                }
+                accesses1++;
+            }
+        }
+        double hitRate1 = (double) hits1 / accesses1;
+        double missRate1 = (double) misses1 / accesses1;
+
+
+        // Алгоритм 2
+        int hits2 = 0;
+        int misses2 = 0;
+        int accesses2=0;
+        for (int i = 0; i < N; i++) {
+            for (int j = 0; j < M; j++) {
+                int blockIndex = (j * N + i) / K;
+                if (cache.containsKey(blockIndex)) {
+                    hits2++;
+                } else {
+                    misses2++;
+                    color[] block = new color[K];
+                    for (int b = 0; b < K; b++) {
+                        int x = j * N + i + b * N;
+                        int row = x % N;
+                        int col = x / N;
+                        block[b] = memory[row][col];
+                        accesses2++;
+                    }
+                    cache.put(blockIndex, block);
+                }
+                accesses2++;
+            }
+        }
+        double hitRate2 = (double) hits2 / accesses2;
+        double missRate2 = (double) misses2 / accesses2;
+
+
+        // Алгоритм 3
+        int hits3 = 0;
+        int misses3 = 0;
+        int accesses3=0;
+        for (int i = 0; i < N; i++) {
+            for (int j = 0; j < M; j++) {
+                memory[i][j].y= 1;
+                hits3++;
+                accesses3++;
+            }
+        }
+
+        for (int i = 0; i < N; i++) {
+            for (int j = 0; j < M; j++) {
+                int blockIndex = (i * M + j) / K;
+                if (cache.containsKey(blockIndex)) {
+                    hits3++;
+                } else {
+                    misses3++;
+                    color[] block = new color[K];
+                    for (int b = 0; b < K; b++) {
+                        int x = i * M + j + b;
+                        int row = x / M;
+                        int col = x % M;
+                        block[b] = memory[row][col];
+                    }
+                    cache.put(blockIndex, block);
+                }
+                accesses3++;
+            }
+        }
+
+        double hitRate3 = (double) hits3 / accesses3;
+        double missRate3 = (double) misses3 / accesses3;
+
+
+        // Вывод всех результатов
+        System.out.println();
+        System.out.println("Algorithm 1:");
+        System.out.println("Total accesses: " + accesses1);
+        System.out.println("Hits: " + hits1);
+        System.out.println("Misses: " + misses1);
+        System.out.println("Hit rate: " + hitRate1);
+        System.out.println("Miss rate: " + missRate1);
+        System.out.println();
+
+
+        System.out.println("Algorithm 2:");
+        System.out.println("Total accesses: " + accesses2);
+        System.out.println("Hits: " + hits2);
+        System.out.println("Misses: " + misses2);
+        System.out.println("Hit rate: " + hitRate2);
+        System.out.println("Miss rate: " + missRate2);
+        System.out.println();
+
+        System.out.println("Algorithm 3:");
+        System.out.println("Total accesses: " + accesses3);
+        System.out.println("Hits: " + hits3);
+        System.out.println("Misses: " + misses3);
+        System.out.println("Hit rate: " + hitRate3);
+        System.out.println("Miss rate: " + missRate3);
+    }
+}
